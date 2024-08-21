@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Semester Grade Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 80%;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .CSS12-01 {color: rgb(59, 153, 136);font-style:italic;font-family: 'Times New Roman', Times, serif;font-size: 50px;}
+    h1 {
+      color: #d32f2f; /* Red color */
+    }
+    button {
+      background-color: #388e3c; /* Green color */
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #2c6c2f;
+    }
+    .history {
+      margin-top: 20px;
+    }
+    .history table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .history th, .history td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    .history th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+   <h1 class="CSS12-01">CSS12-01 STUDENTS SEMESTER GRADE</h1>
+    <h1>Semester Grade Calculator</h1>
+    <h5>made by:xyrun and chat gpt</h5>
+    <form id="grade-form">
+      <label for="name">Student Name:</label>
+      <input type="text" id="name" required>
+      <br>
+      <label for="grades">Grades (comma separated):</label>
+      <input type="text" id="grades" required>
+      <br><br>
+      <button type="submit">Calculate Average</button>
+    </form>
+    <h2 id="average-result"></h2>
+    <div class="history">
+      <h2>History</h2>
+      <table id="history-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Grades</th>
+            <th>Average</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    document.getElementById('grade-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const grades = document.getElementById('grades').value.split(',').map(Number);
+
+      try {
+        const response = await fetch('/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, grades })
+        });
+
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        document.getElementById('average-result').textContent = `Average Grade: ${data.average}`;
+
+        loadHistory();
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+
+    async function loadHistory() {
+      try {
+        const response = await fetch('/history');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const history = await response.json();
+        const tableBody = document.getElementById('history-table').querySelector('tbody');
+        tableBody.innerHTML = '';
+        history.forEach(entry => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${new Date(entry.date).toLocaleString()}</td>
+            <td>${entry.name}</td>
+            <td>${entry.grades.join(', ')}</td>
+            <td>${entry.average}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Load history on page load
+    loadHistory();
+  </script>
+</body>
+</html>

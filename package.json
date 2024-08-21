@@ -1,0 +1,12 @@
+{
+  "name": "css12-01-sinhs",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
+
+
